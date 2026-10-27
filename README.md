@@ -1,6 +1,6 @@
 # TaskFlow
 
-TaskFlow adalah aplikasi dashboard sederhana untuk mengelola pekerjaan. Saat ini aplikasi menyediakan sidebar responsif dengan tiga menu: **Dashboard**, **My Task**, dan **Settings**.
+TaskFlow adalah aplikasi untuk mengelola pekerjaan dengan autentikasi Supabase. Dashboard menyediakan menu **Dashboard**, **My Task**, dan **Settings**. Pengguna dapat membuat, melihat, mengubah status, mengedit, dan menghapus tugas miliknya.
 
 ## Teknologi
 
@@ -8,6 +8,7 @@ TaskFlow adalah aplikasi dashboard sederhana untuk mengelola pekerjaan. Saat ini
 - React 19
 - TypeScript
 - Tailwind CSS 4
+- Supabase Auth dan PostgreSQL Row Level Security (RLS)
 
 ## Persyaratan
 
@@ -32,7 +33,15 @@ Buka [http://localhost:3000](http://localhost:3000) di browser.
 
 ## Environment
 
-Saat ini aplikasi belum membutuhkan variabel environment. Jika konfigurasi diperlukan nanti, simpan nilainya di file `.env.local` (file environment lokal diabaikan oleh Git). Jangan commit kredensial atau rahasia. File `.env.example` boleh digunakan untuk mendokumentasikan nama variabel tanpa nilai rahasia.
+Salin `.env.example` ke `.env.local`, lalu isi URL proyek dan publishable key Supabase. Jangan commit nilai rahasia.
+
+## Database Supabase
+
+Tabel `public.tasks` menggunakan kolom `id`, `user_id`, `title`, `description`, `status`, `priority`, `due_date`, dan `created_at`. Nilai status yang diizinkan adalah `todo`, `in_progress`, dan `done`; prioritas `low`, `medium`, dan `high`.
+
+Jalankan SQL di [`supabase/migrations/20261027000000_create_tasks.sql`](./supabase/migrations/20261027000000_create_tasks.sql) melalui Supabase CLI atau SQL Editor. Migrasi ini membuat tabel jika belum ada, mengaktifkan RLS, dan membatasi operasi baca/tulis/hapus ke pemilik tugas (`auth.uid() = user_id`). Jika tabel dan kebijakan yang sama sudah dibuat manual, kebijakan akan dibuat ulang dengan aman. Server Action juga memverifikasi sesi dan mengisi `user_id` dari pengguna terautentikasi.
+
+Untuk konfirmasi email, tambahkan URL `/auth/callback` aplikasi ke daftar **Redirect URLs** di pengaturan Supabase Auth.
 
 ## Perintah yang tersedia
 
